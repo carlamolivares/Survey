@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutrition & Eating Habits Survey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #F7F4EE;
+    --card: #FFFFFF;
+    --ink: #21363A;
+    --ink-soft: #5B6B6D;
+    --coral: #D6552F;
+    --gold: #C99A3A;
+    --sage: #6E8B6E;
+    --line: #DED5C3;
+    --line-soft: #EBE5D8;
+  }
+
+  * { box-sizing: border-box; }
+
+  #survey-root {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    padding: 28px 20px 40px;
+    border-radius: 14px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+  }
+
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .masthead .tally {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  .tally strong {
+    display: block;
+    font-size: 22px;
+    color: var(--coral);
+    font-weight: 500;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 22px;
+    background: var(--line-soft);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 9px 12px;
+    border: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    letter-spacing: 0.01em;
+  }
+
+  .tab-btn.active {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(33,54,58,0.12);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 7px;
+    background: var(--paper);
+    color: var(--ink);
+    resize: none;
+  }
+
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--coral);
+  }
+
+  .name-card { border-left: 3px solid var(--ink); }
+
+  .q-card { border-left: 3px solid var(--gold); position: relative; }
+
+  .q-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .q-title-input {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    padding: 0 0 10px 0;
+    width: 100%;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: 14px;
+  }
+  .q-title-input:focus { outline: none; border-bottom-color: var(--coral); }
+
+  .subfield { margin-bottom: 14px; }
+  .subfield:last-child { margin-bottom: 0; }
+
+  .scale-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .scale-dot {
+    flex: 1;
+    aspect-ratio: 1;
+    max-width: 46px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .scale-dot:hover { border-color: var(--sage); }
+
+  .scale-dot.selected {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+
+  .scale-caption {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 5px;
+    font-style: italic;
+  }
+
+  .q-static-title {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .choice-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .choice-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .choice-btn:hover { border-color: var(--sage); }
+
+  .choice-btn.selected {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+
+  .choice-key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .char-count {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 5px;
+  }
+
+  textarea { min-height: 56px; font-family: 'Inter', sans-serif; }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--coral);
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: filter 0.15s ease;
+  }
+  .submit-btn:hover { filter: brightness(1.08); }
+  .submit-btn:disabled { background: var(--line); cursor: not-allowed; }
+
+  .toast {
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--sage);
+    margin-top: 10px;
+    min-height: 16px;
+  }
+
+  /* Responses tab */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .stat-q {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding: 3px 0;
+  }
+  .stat-row b { color: var(--ink); font-weight: 500; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+  .empty-state .big { font-size: 34px; margin-bottom: 8px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  th {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    text-align: left;
+    padding: 9px 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 9px 10px;
+    border-top: 1px solid var(--line-soft);
+    vertical-align: top;
+    font-family: 'Inter', sans-serif;
+  }
+
+  tr:nth-child(even) td { background: var(--paper); }
+
+  .table-wrap { overflow-x: auto; margin-bottom: 16px; }
+
+  .actions-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .ghost-btn {
+    flex: 1;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--ink-soft);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .ghost-btn:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .ghost-btn.danger:hover { border-color: var(--coral); color: var(--coral); }
+</style>
+
+</head>
+<body>
+
+<div id="survey-root">
+  <div class="masthead">
+    <h1>Field Survey</h1>
+    <div class="tally">responses logged<strong id="tally-count">0</strong></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-take" onclick="showTab('take')">Take Survey</button>
+    <button class="tab-btn" id="tab-view" onclick="showTab('view')">Responses & Stats</button>
+  </div>
+
+  <div id="panel-take">
+    <div class="card name-card">
+      <span class="field-label">Respondent name</span>
+      <input type="text" id="resp-name" placeholder="e.g. Jordan Alvarez" />
+    </div>
+
+    <div id="questions-container"></div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitResponse()">Log response</button>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <div id="panel-view" style="display:none;">
+    <div id="stats-area"></div>
+    <div id="table-area"></div>
+    <div class="actions-row" id="actions-row" style="display:none;">
+      <button class="ghost-btn" onclick="exportCSV()">Export CSV</button>
+      <button class="ghost-btn danger" onclick="clearAll()">Clear all responses</button>
+    </div>
+  </div>
+</div>
+
+<!--
+  ============================================================
+  FIREBASE SETUP — read this before deploying
+  ============================================================
+  This survey needs somewhere to store responses that everyone's
+  device can read and write to. Firebase Firestore (free tier)
+  does that job. Steps:
+
+  1. Go to https://console.firebase.google.com and create a project.
+  2. In the project, click "Build > Firestore Database" > "Create database".
+     Start in TEST MODE for now (see security note below).
+  3. Click the gear icon > Project settings > scroll to "Your apps" >
+     click the </> (web) icon > register an app (nickname anything).
+  4. Firebase will show you a firebaseConfig object. Copy the values
+     into the block below, replacing every "REPLACE_ME".
+  5. In Firestore, go to the "Rules" tab and paste:
+
+       rules_version = '2';
+       service cloud.firestore {
+         match /databases/{database}/documents {
+           match /responses/{responseId} {
+             allow read, create: if true;
+             allow update, delete: if false;
+           }
+         }
+       }
+
+     This lets anyone submit or read responses (needed for a public
+     survey link) but nobody can edit or delete existing entries from
+     the client side — only you, from the Firebase console, can clear
+     data. Click "Publish" after pasting.
+  6. Commit and push this repo, then enable GitHub Pages
+     (Settings > Pages > Deploy from branch > main > /root).
+  ============================================================
+-->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCCJ8iJ2laJ9rgsc-Bh4ZESqMlqC59Khr4",
+    authDomain: "mat152-survey.firebaseapp.com",
+    projectId: "mat152-survey",
+    storageBucket: "mat152-survey.firebasestorage.app",
+    messagingSenderId: "572741460856",
+    appId: "1:572741460856:web:482b2f962730337a495e8d",
+    measurementId: "G-PR4GVZRGZ6"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+<script>
+(function() {
+  const QUESTIONS = [
+    {
+      type: 'choice',
+      text: 'When purchasing groceries or ordering food, how frequently do you look at the nutritional facts or ingredient labels?',
+      options: [
+        { key: 'a', label: 'Always' },
+        { key: 'b', label: 'Often' },
+        { key: 'c', label: 'Rarely' },
+        { key: 'd', label: 'Never' }
+      ]
+    },
+    {
+      type: 'short_answer',
+      text: 'In a typical week, how many home-cooked meals do you prepare?',
+      maxLength: 250
+    },
+    {
+      type: 'short_answer',
+      text: 'In a typical week, approximately how much money do you spend on dining out or ordering takeout?',
+      maxLength: 250
+    }
+  ];
+
+  let currentAnswers = QUESTIONS.map(() => null);
+  let responses = [];
+
+  const container = document.getElementById('questions-container');
+
+  function renderQuestions() {
+    container.innerHTML = '';
+    QUESTIONS.forEach((q, i) => {
+      const qCard = document.createElement('div');
+      qCard.className = 'card q-card';
+
+      if (q.type === 'choice') {
+        qCard.innerHTML = `
+          <div class="q-num">Question ${i + 1} &middot; multiple choice</div>
+          <div class="q-static-title">${escapeHtml(q.text)}</div>
+          <div class="choice-row" data-q="${i}">
+            ${q.options.map(opt => `<button type="button" class="choice-btn" data-key="${opt.key}" data-q="${i}"><span class="choice-key">${opt.key}</span>${escapeHtml(opt.label)}</button>`).join('')}
+          </div>
+        `;
+      } else {
+        qCard.innerHTML = `
+          <div class="q-num">Question ${i + 1} &middot; short answer</div>
+          <div class="q-static-title">${escapeHtml(q.text)}</div>
+          <textarea placeholder="Type your answer..." maxlength="${q.maxLength}" data-qtext="${i}"></textarea>
+          <div class="char-count" data-count="${i}">0 / ${q.maxLength}</div>
+        `;
+      }
+      container.appendChild(qCard);
+    });
+
+    container.querySelectorAll('.choice-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const el = e.currentTarget;
+        const q = +el.dataset.q;
+        const key = el.dataset.key;
+        currentAnswers[q] = key;
+        container.querySelectorAll(`.choice-btn[data-q="${q}"]`).forEach(b => {
+          b.classList.toggle('selected', b.dataset.key === key);
+        });
+      });
+    });
+
+    container.querySelectorAll('textarea[data-qtext]').forEach(ta => {
+      ta.addEventListener('input', e => {
+        const i = +e.target.dataset.qtext;
+        currentAnswers[i] = e.target.value;
+        const counter = container.querySelector(`.char-count[data-count="${i}"]`);
+        if (counter) counter.textContent = `${e.target.value.length} / ${QUESTIONS[i].maxLength}`;
+      });
+    });
+  }
+
+  function escapeAttr(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  window.showTab = function(which) {
+    document.getElementById('tab-take').classList.toggle('active', which === 'take');
+    document.getElementById('tab-view').classList.toggle('active', which === 'view');
+    document.getElementById('panel-take').style.display = which === 'take' ? 'block' : 'none';
+    document.getElementById('panel-view').style.display = which === 'view' ? 'block' : 'none';
+    if (which === 'view') renderView();
+  };
+
+  window.submitResponse = async function() {
+    const name = document.getElementById('resp-name').value.trim();
+    const toast = document.getElementById('toast');
+
+    if (!name) {
+      toast.style.color = 'var(--coral)';
+      toast.textContent = 'Add a respondent name first.';
+      return;
+    }
+    if (currentAnswers[0] === null) {
+      toast.style.color = 'var(--coral)';
+      toast.textContent = 'Question 1 needs a selection.';
+      return;
+    }
+    if (!currentAnswers[1] || !currentAnswers[1].trim()) {
+      toast.style.color = 'var(--coral)';
+      toast.textContent = 'Question 2 needs an answer.';
+      return;
+    }
+    if (!currentAnswers[2] || !currentAnswers[2].trim()) {
+      toast.style.color = 'var(--coral)';
+      toast.textContent = 'Question 3 needs an answer.';
+      return;
+    }
+
+    const entry = {
+      name,
+      timestamp: new Date().toISOString(),
+      answers: currentAnswers.slice()
+    };
+
+    try {
+      await db.collection('responses').add(entry);
+      toast.style.color = 'var(--sage)';
+      toast.textContent = `Logged for ${name}.`;
+      document.getElementById('resp-name').value = '';
+      currentAnswers = QUESTIONS.map(() => null);
+      renderQuestions();
+      await loadResponses();
+    } catch (err) {
+      toast.style.color = 'var(--coral)';
+      toast.textContent = 'Could not save — try again.';
+      console.error(err);
+    }
+  };
+
+  async function loadResponses() {
+    try {
+      const snapshot = await db.collection('responses').orderBy('timestamp', 'asc').get();
+      const loaded = [];
+      snapshot.forEach(doc => {
+        loaded.push({ id: doc.id, ...doc.data() });
+      });
+      responses = loaded;
+      document.getElementById('tally-count').textContent = responses.length;
+    } catch (err) {
+      responses = [];
+      console.error('load failed', err);
+    }
+  }
+
+  function mean(arr) { return arr.reduce((a,b) => a+b, 0) / arr.length; }
+  function median(arr) {
+    const s = [...arr].sort((a,b) => a-b);
+    const m = Math.floor(s.length / 2);
+    return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
+  }
+  function stdev(arr) {
+    const m = mean(arr);
+    const variance = arr.reduce((a,b) => a + Math.pow(b - m, 2), 0) / arr.length;
+    return Math.sqrt(variance);
+  }
+  function mode(arr) {
+    const counts = {};
+    arr.forEach(v => counts[v] = (counts[v]||0) + 1);
+    let best = null, bestCount = 0;
+    Object.entries(counts).forEach(([v,c]) => { if (c > bestCount) { best = v; bestCount = c; } });
+    return best;
+  }
+  // pulls the first numeric token out of a free-text short answer, e.g. "about 3 meals" -> 3
+  function extractNumber(text) {
+    if (!text) return null;
+    const match = String(text).match(/-?\d+(\.\d+)?/);
+    return match ? parseFloat(match[0]) : null;
+  }
+
+  function renderView() {
+    const statsArea = document.getElementById('stats-area');
+    const tableArea = document.getElementById('table-area');
+    const actionsRow = document.getElementById('actions-row');
+
+    if (responses.length === 0) {
+      statsArea.innerHTML = '';
+      tableArea.innerHTML = `<div class="card empty-state"><div class="big">📋</div>No responses logged yet.<br/>Switch to "Take Survey" to add the first one.</div>`;
+      actionsRow.style.display = 'none';
+      return;
+    }
+
+    actionsRow.style.display = 'flex';
+
+    let statsHtml = '<div class="stat-grid">';
+
+    // Q1: categorical frequency counts
+    const q1Counts = { a: 0, b: 0, c: 0, d: 0 };
+    responses.forEach(r => { if (r.answers[0] in q1Counts) q1Counts[r.answers[0]]++; });
+    const q1Labels = { a: 'Always', b: 'Often', c: 'Rarely', d: 'Never' };
+    const q1Total = responses.length;
+    statsHtml += `
+      <div class="stat-card">
+        <div class="stat-q">Q1. Label-checking frequency</div>
+        ${Object.keys(q1Counts).map(k => `<div class="stat-row"><span>${q1Labels[k]}</span><b>${q1Counts[k]} (${q1Total ? Math.round(100*q1Counts[k]/q1Total) : 0}%)</b></div>`).join('')}
+        <div class="stat-row"><span>n</span><b>${q1Total}</b></div>
+      </div>`;
+
+    // Q2 and Q3: try to extract numbers from short answers for basic descriptive stats
+    [1, 2].forEach(i => {
+      const label = i === 1 ? 'Q2. Home-cooked meals/week' : 'Q3. Weekly dining-out spend';
+      const nums = responses.map(r => extractNumber(r.answers[i])).filter(v => v !== null);
+      if (nums.length) {
+        statsHtml += `
+          <div class="stat-card">
+            <div class="stat-q">${label}</div>
+            <div class="stat-row"><span>Mean</span><b>${mean(nums).toFixed(2)}</b></div>
+            <div class="stat-row"><span>Median</span><b>${median(nums)}</b></div>
+            <div class="stat-row"><span>Mode</span><b>${mode(nums)}</b></div>
+            <div class="stat-row"><span>Std dev</span><b>${stdev(nums).toFixed(2)}</b></div>
+            <div class="stat-row"><span>Range</span><b>${Math.min(...nums)}–${Math.max(...nums)}</b></div>
+            <div class="stat-row"><span>n (numeric)</span><b>${nums.length} / ${responses.length}</b></div>
+          </div>`;
+      } else {
+        statsHtml += `
+          <div class="stat-card">
+            <div class="stat-q">${label}</div>
+            <div class="stat-row"><span>n</span><b>${responses.length}</b></div>
+            <div class="stat-row" style="font-style:italic;">No numeric values detected yet</div>
+          </div>`;
+      }
+    });
+
+    statsHtml += '</div>';
+    statsArea.innerHTML = statsHtml;
+
+    let rows = responses.map(r => {
+      const date = new Date(r.timestamp);
+      const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      return `<tr>
+        <td>${escapeHtml(r.name)}</td>
+        <td>${dateStr}</td>
+        <td>${escapeHtml(q1Labels[r.answers[0]] || r.answers[0] || '')}</td>
+        <td>${escapeHtml(r.answers[1] || '')}</td>
+        <td>${escapeHtml(r.answers[2] || '')}</td>
+      </tr>`;
+    }).join('');
+
+    const headers = '<th>Name</th><th>Logged</th><th>Q1 label-checking</th><th>Q2 home-cooked meals</th><th>Q3 dining-out spend</th>';
+
+    tableArea.innerHTML = `<div class="table-wrap"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  window.exportCSV = function() {
+    if (responses.length === 0) return;
+    const q1Labels = { a: 'Always', b: 'Often', c: 'Rarely', d: 'Never' };
+    const headers = [
+      'Name', 'Timestamp',
+      'Q1 label-checking frequency',
+      'Q2 home-cooked meals per week',
+      'Q3 weekly dining-out spend'
+    ];
+    const csvRows = [headers.map(csvEscape).join(',')];
+    responses.forEach(r => {
+      const row = [
+        r.name,
+        r.timestamp,
+        q1Labels[r.answers[0]] || r.answers[0] || '',
+        r.answers[1] || '',
+        r.answers[2] || ''
+      ];
+      csvRows.push(row.map(csvEscape).join(','));
+    });
+    const csv = csvRows.join('\n');
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'survey_responses.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  function csvEscape(v) {
+    const s = String(v ?? '');
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
+  window.clearAll = async function() {
+    if (!confirm('Delete all logged responses? This cannot be undone.')) return;
+    for (const r of responses) {
+      try { await db.collection('responses').doc(r.id).delete(); } catch (e) {}
+    }
+    responses = [];
+    document.getElementById('tally-count').textContent = 0;
+    renderView();
+  };
+
+  // init
+  currentAnswers = QUESTIONS.map(() => null);
+  renderQuestions();
+  loadResponses().then(() => {
+    if (document.getElementById('panel-view').style.display !== 'none') renderView();
+  });
+})();
+</script>
+
+</body>
+</html>
