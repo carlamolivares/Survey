@@ -708,16 +708,16 @@
     statsArea.innerHTML = statsHtml;
 
     let rows = responses.map(r => {
-      const date = new Date(r.timestamp);
-      const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      return `<tr>
-        <td>${escapeHtml(r.name)}</td>
-        <td>${dateStr}</td>
-        <td>${escapeHtml(q1Labels[r.answers[0]] || r.answers[0] || '')}</td>
-        <td>${escapeHtml(r.answers[1] || '')}</td>
-        <td>${escapeHtml(r.answers[2] || '')}</td>
-      </tr>`;
-    }).join('');
+  const date = new Date(r.timestamp);
+  const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  return `<tr>
+    <td>${escapeHtml(r.name)}</td>
+    <td>${dateStr}</td>
+    <td>${escapeHtml(q1Labels[r.answers[0]] || r.answers[0] || '')}</td>
+    <td>${escapeHtml(r.answers[1] || '')}</td>
+    <td>${escapeHtml(r.answers[2] || '')}</td>
+  </tr>`;
+});
 
     const headers = '<th>Name</th><th>Logged</th><th>Q1 label-checking</th><th>Q2 home-cooked meals</th><th>Q3 dining-out spend</th>';
 
@@ -734,14 +734,9 @@
       'Q3 weekly dining-out spend'
     ];
     const csvRows = [headers.map(csvEscape).join(',')];
-    responses.forEach(r => {
-      const row = [
-        r.name,
-        r.timestamp,
-        q1Labels[r.answers[0]] || r.answers[0] || '',
-        r.answers[1] || '',
-        r.answers[2] || ''
-      ];
+    responses.forEach(r => { 
+      if (r.answers && r.answers[0] 
+          in q1Counts) q1Counts[r.answers[0]]++; });
       csvRows.push(row.map(csvEscape).join(','));
     });
     const csv = csvRows.join('\n');
