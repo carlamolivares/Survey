@@ -669,7 +669,10 @@
 
     // Q1: categorical frequency counts
     const q1Counts = { a: 0, b: 0, c: 0, d: 0 };
-    responses.forEach(r => { if (r.answers[0] in q1Counts) q1Counts[r.answers[0]]++; });
+    responses.forEach(r => {
+      const ans = r.answers || [];
+      if (ans[0] in q1Counts) q1Counts[ans[0]]++;
+    });
     const q1Labels = { a: 'Always', b: 'Often', c: 'Rarely', d: 'Never' };
     const q1Total = responses.length;
     statsHtml += `
@@ -682,7 +685,7 @@
     // Q2 and Q3: try to extract numbers from short answers for basic descriptive stats
     [1, 2].forEach(i => {
       const label = i === 1 ? 'Q2. Home-cooked meals/week' : 'Q3. Weekly dining-out spend';
-      const nums = responses.map(r => extractNumber(r.answers[i])).filter(v => v !== null);
+      const nums = responses.map(r => extractNumber((r.answers || [])[i])).filter(v => v !== null);
       if (nums.length) {
         statsHtml += `
           <div class="stat-card">
@@ -708,16 +711,17 @@
     statsArea.innerHTML = statsHtml;
 
     let rows = responses.map(r => {
-  const date = new Date(r.timestamp);
-  const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  return `<tr>
-    <td>${escapeHtml(r.name)}</td>
-    <td>${dateStr}</td>
-    <td>${escapeHtml(q1Labels[r.answers[0]] || r.answers[0] || '')}</td>
-    <td>${escapeHtml(r.answers[1] || '')}</td>
-    <td>${escapeHtml(r.answers[2] || '')}</td>
-  </tr>`;
-});
+      const ans = r.answers || [];
+      const date = new Date(r.timestamp);
+      const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      return `<tr>
+        <td>${escapeHtml(r.name || '')}</td>
+        <td>${dateStr}</td>
+        <td>${escapeHtml(q1Labels[ans[0]] || ans[0] || '')}</td>
+        <td>${escapeHtml(ans[1] || '')}</td>
+        <td>${escapeHtml(ans[2] || '')}</td>
+      </tr>`;
+    }).join('');
 
     const headers = '<th>Name</th><th>Logged</th><th>Q1 label-checking</th><th>Q2 home-cooked meals</th><th>Q3 dining-out spend</th>';
 
@@ -734,9 +738,15 @@
       'Q3 weekly dining-out spend'
     ];
     const csvRows = [headers.map(csvEscape).join(',')];
-    responses.forEach(r => { 
-      if (r.answers && r.answers[0] 
-          in q1Counts) q1Counts[r.answers[0]]++; });
+    responses.forEach(r => {
+      const ans = r.answers || [];
+      const row = [
+        r.name || '',
+        r.timestamp || '',
+        q1Labels[ans[0]] || ans[0] || '',
+        ans[1] || '',
+        ans[2] || ''
+      ];
       csvRows.push(row.map(csvEscape).join(','));
     });
     const csv = csvRows.join('\n');
