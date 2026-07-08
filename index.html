@@ -703,43 +703,7 @@
           </div>`;
       }
     });
-// Add this button somewhere in your HTML:
-// <button id="exportBtn">Export Responses to CSV</button>
 
-import { collection, getDocs } from "firebase/firestore";
-// (adjust import based on whether you're using compat or modular SDK)
-
-document.getElementById('exportBtn').addEventListener('click', async () => {
-  const snapshot = await getDocs(collection(db, "responses"));
-  const rows = [];
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    rows.push({
-      id: doc.id,
-      name: data.name || '',
-      answer1: data.answers?.[0] ?? '',
-      answer2: data.answers?.[1] ?? '',
-      answer3: data.answers?.[2] ?? '',
-      timestamp: data.timestamp || ''
-    });
-  });
-
-  const headers = Object.keys(rows[0]).join(',');
-  const csvRows = rows.map(r =>
-    Object.values(r).map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
-  );
-  const csvContent = [headers, ...csvRows].join('\n');
-
-  // Trigger a download in the browser
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'survey_responses.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-});
     statsHtml += '</div>';
     statsArea.innerHTML = statsHtml;
 
